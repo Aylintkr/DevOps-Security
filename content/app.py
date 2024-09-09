@@ -88,3 +88,5 @@ def signout():
     response = make_response(redirect('/'))
     response.delete_cookie('user_id')
     return response
+
+#test
