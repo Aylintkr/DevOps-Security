@@ -26,8 +26,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: |
-            aylinistrash/devops_security:latest
+          tags: aylinistrash/devops_security:latest
   test:
     name: Test
    # needs: [ scan ]
@@ -43,7 +42,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
       - name: test 
         run: |
-          docker run -d -p 80:5000 aylinistrash/student-app:latest
+          docker run -d -p 80:5000 aylinistrash/devops_security:latest
           sleep 10s
           curl http://localhost
           docker ps -aq | xargs docker stop | xargs docker rm
