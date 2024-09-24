@@ -20,8 +20,6 @@ spec:
       - name: quoterxp
         image: aylinistrash/devops_security:latest
         imagePullPolicy: Always
-        securityContext:
-        allowPrivilegeEscalation: false
         ports:
           - containerPort: 5000
       imagePullSecrets:

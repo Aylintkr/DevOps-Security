@@ -27,9 +27,24 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: aylinistrash/devops_security:latest
+
+    scan:
+    name: Vulnerability Scan
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker Scout scan
+        uses: docker/scout-action@v0
+        with:
+          image: aylinistrash/devops_security:latest
+          token: ${{ secrets.TOKEN_GITHUB }}
+        env:
+          DOCKER_SCOUT_API_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+
+
   test:
     name: Test
-    needs: [ build ]
+    needs: [ scan ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
