@@ -28,19 +28,30 @@ jobs:
           push: true
           tags: aylinistrash/devops_security:latest
 
-    scan:
-      name: Scan
-      needs: [ build ]
-      runs-on: ubuntu-latest
-      steps:
-      - name: Docker Scout scan
-        uses: docker/scout-action@v0
+  scan:
+    name: Scan
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
         with:
-          image: aylinistrash/devops_security:latest
-          token: ${{ secrets.TOKEN_GITHUB }}
-        env:
-          DOCKER_SCOUT_API_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+          username: ${{ secrets. DOCKER_HUB_USERNAME }}
+          password: ${{ secrets. DOCKER_HUB_PASSWORD }}
 
+      - name: Docker Scout CVEs
+        uses: docker/scout-action@v1.5.0
+        with:
+        command: cves
+        image: aylinistrash/devops_security:latest
+# only-fixed: true
+        only-severities: critical,high
+        ignore-base: false
+        ignore-unchanged: false
+        write-comment: true
+        github-token: ${{ secrets. TOKEN_GITHUB }} # to be able to write the comment
+        exit-code: true
+        exit-on: vulnerability
 
   test:
     name: Test
