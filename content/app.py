@@ -35,12 +35,11 @@ def index():
     quotes = db.execute("select id, text, attribution from quotes order by id").fetchall()
     return templates.main_page(quotes, request.user_id, request.args.get('error'))
 
-
 # The quote comments page
 @app.route("/quotes/<int:quote_id>")
 def get_comments_page(quote_id):
-    quote = db.execute(f"select id, text, attribution from quotes where id={quote_id}").fetchone()
-    comments = db.execute(f"select text, datetime(time,'localtime') as time, name as user_name from comments c left join users u on u.id=c.user_id where quote_id={quote_id} order by c.id").fetchall()
+    quote = db.execute("select id, text, attribution from quotes where id=?", (quote_id,)).fetchone()
+    comments = db.execute("select text, datetime(time,'localtime') as time, name as user_name from comments c left join users u on u.id=c.user_id where quote_id=? order by c.id", (quote_id,)).fetchall()
     return templates.comments_page(quote, comments, request.user_id)
 
 
@@ -48,39 +47,34 @@ def get_comments_page(quote_id):
 @app.route("/quotes", methods=["POST"])
 def post_quote():
     with db:
-        db.execute(f"""insert into quotes(text,attribution) values("{request.form['text']}","{request.form['attribution']}")""")
+        db.execute("insert into quotes(text,attribution) values(?,?)", (request.form['text'], request.form['attribution']))
     return redirect("/#bottom")
-
 
 # Post a new comment
 @app.route("/quotes/<int:quote_id>/comments", methods=["POST"])
 def post_comment(quote_id):
     with db:
-        db.execute(f"""insert into comments(text,quote_id,user_id) values("{request.form['text']}",{quote_id},{request.user_id})""")
+        db.execute("insert into comments(text,quote_id,user_id) values(?,?,?)", (request.form['text'], quote_id, request.user_id))
     return redirect(f"/quotes/{quote_id}#bottom")
-
 
 # Sign in user
 @app.route("/signin", methods=["POST"])
 def signin():
     username = request.form["username"].lower()
-    password = request.form["password"]
-
-    user = db.execute(f"select id, password from users where name='{username}'").fetchone()
+    user = db.execute("select id, password from users where name=?", (username,)).fetchone()
     if user: # user exists
-        if password != user['password']:
+        if request.form["password"] != user['password']:
             # wrong! redirect to main page with an error message
             return redirect('/?error='+urllib.parse.quote("Invalid password!"))
         user_id = user['id']
     else: # new sign up
         with db:
-            cursor = db.execute(f"insert into users(name,password) values('{username}', '{password}')")
+            cursor = db.execute("insert into users(name,password) values(?, ?)", (username, request.form["password"]))
             user_id = cursor.lastrowid
-    
+
     response = make_response(redirect('/'))
     response.set_cookie('user_id', str(user_id))
     return response
-
 
 # Sign out user
 @app.route("/signout", methods=["GET"])
