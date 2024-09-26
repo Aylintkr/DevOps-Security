@@ -1,0 +1,41 @@
+{
+	"info": {
+		"_postman_id": "37b422e3-0f3e-49fa-b92e-2d34ef52aac8",
+		"name": "DevOps Security Test",
+		"description": "Voor de opdracht van week 3",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_uid": "38559643-37b422e3-0f3e-49fa-b92e-2d34ef52aac8"
+	},
+	"item": [],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "607a334d-0845-4948-bb39-d3f06fa7595b",
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "28c5327e-a650-48c5-a066-30777d857a98",
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"pm.test(\"Status code is 200\", function () {\r",
+					"    pm.response.to.have.status(200);\r",
+					"});\r",
+					"\r",
+					"pm.test(\"Response time is less than 300ms\", () => {\r",
+					"    pm.expect (pm.response.responseTime).to.be.below(300);\r",
+					"});\r",
+					""
+				]
+			}
+		}
+	]
+}
