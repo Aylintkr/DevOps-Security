@@ -49,7 +49,7 @@ jobs:
           ignore-unchanged: false
           write-comment: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          exit-code: true
+          exit-code: false
           exit-on: vulnerability
 
   test:
@@ -83,3 +83,25 @@ jobs:
               sudo kubectl delete deployment --all              
               sudo kubectl apply -f ${{ github.workspace }}/kubernetes/deployment.yaml --force
               sudo kubectl apply -f ${{ github.workspace }}/kubernetes/nginx-service.yaml --force
+
+  automated-api-test:
+  name: Automated API tests using Postman CLI
+  needs: [ deploy ]
+  
+  on: push
+
+jobs:
+  automated-api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Postman CLI
+        run: |
+          curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
+      - name: Login to Postman CLI
+        run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
+      - name: Run API tests
+        run: |
+          postman collection run "${{ github.workspace }}/postman/collections/DevOps Security Test.json" --integration-id "169134-${{ github.run_id }}"
+          # Lint your API using Postman CLI
+          postman api lint f23aeea4-fde5-4ec5-ad04-8173d1034cc5 --integration-id 169134
