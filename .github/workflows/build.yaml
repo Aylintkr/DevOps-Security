@@ -85,13 +85,8 @@ jobs:
               sudo kubectl apply -f ${{ github.workspace }}/kubernetes/nginx-service.yaml --force
 
   automated-api-test:
-  name: Automated API tests using Postman CLI
-  needs: [ deploy ]
-  
-  on: push
-
-jobs:
-  automated-api-tests:
+    name: Automated API tests using Postman CLI
+    needs: [ deploy ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -103,5 +98,6 @@ jobs:
       - name: Run API tests
         run: |
           postman collection run "${{ github.workspace }}/postman/collections/DevOps Security Test.json" --integration-id "169134-${{ github.run_id }}"
-          # Lint your API using Postman CLI
+      - name: Lint your API using Postman CLI
+        run: |
           postman api lint f23aeea4-fde5-4ec5-ad04-8173d1034cc5 --integration-id 169134
