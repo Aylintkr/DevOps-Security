@@ -85,7 +85,7 @@ jobs:
               sudo kubectl apply -f ${{ github.workspace }}/kubernetes/nginx-service.yaml --force
 
   automated-api-test:
-    name: Automated API tests using Postman CLI
+    name: Automated API tests Postman CLI
     needs: [ deploy ]
     runs-on: ubuntu-latest
     steps:
@@ -98,3 +98,4 @@ jobs:
       - name: Run API tests
         run: |
           postman collection run "38559643-f2410b28-8718-4ce0-8887-448cb5fea9a9" -e "38559643-ae89058e-5463-48f2-b80f-890afd9ce897" --integration-id "169184-${{ github.run_id }}"
+          
